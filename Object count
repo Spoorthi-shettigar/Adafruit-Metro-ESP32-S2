@@ -1,0 +1,27 @@
+const int irPin = 7;
+int counter = 0;
+bool objectDetected = false;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(irPin, INPUT);
+  Serial.println("IR Object Counter Started");
+}
+
+void loop() {
+  int irValue = digitalRead(irPin);
+
+  if (irValue == LOW && !objectDetected) {
+    
+    counter++;
+    objectDetected = true;
+    Serial.print("Object Count: ");
+    Serial.println(counter);
+  }
+
+  if (irValue == HIGH) {
+    objectDetected = false;
+  }
+
+  delay(100); 
+}
