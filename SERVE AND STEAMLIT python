@@ -1,0 +1,51 @@
+//SERVE python 
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(_name_)
+CORS(app)
+
+latest_data = {"distance": None}
+
+@app.route('/data', methods=['POST'])
+def receive_data():
+    global latest_data
+    data = request.get_json()
+    if "distance" in data:
+        latest_data["distance"] = data["distance"]
+        print("Received:", data)
+        return jsonify({"status": "success"}), 200
+    return jsonify({"error": "Invalid data"}), 400
+
+@app.route('/latest', methods=['GET'])
+def get_latest():
+    return jsonify(latest_data)
+
+if _name_ == '_main_':
+    app.run(host='0.0.0.0', port=5000)
+
+
+//STEAMLIT
+
+import streamlit as st
+import requests
+import time
+
+st.title("Live Ultrasonic Sensor Data")
+
+url = "http://localhost:5000/latest"  # or replace with FLASK_PC_IP
+
+placeholder = st.empty()
+
+while True:
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        distance = data.get("distance", "No data")
+        with placeholder.container():
+            st.metric("Distance (cm)", f"{distance:.2f}" if isinstance(distance, (int, float)) else str(distance))
+        time.sleep(2)
+    except Exception as e:
+        st.error(f"Error fetching data: {e}")
+        break
